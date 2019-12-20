@@ -1,5 +1,5 @@
 setcps 1.0
 
-d1 $ s "bd"
+d1 $ s "bd" # orbit (cI 0 "int")
 
 hush

@@ -10,72 +10,74 @@ const TIDAL_OSC_DEFAULTS = {
 }
 
 const TIDAL_OSC_ADDRESSES = {
-	controller: '/ctrl',
+	ctrl: '/ctrl',
 	play: '/play2'
 }
 
 class Tidal extends EventEmitter {
 	constructor(options) {
-        super()
+		super()
 
 		this.options = options || TIDAL_OSC_DEFAULTS
 
-		const udpPort = new osc.UDPPort({
-			localAddress: this.options.inAddress || TIDAL_OSC_DEFAULTS.inAddress,
+		this.udpPort = new osc.UDPPort({
+			localAddress:
+				this.options.inAddress || TIDAL_OSC_DEFAULTS.inAddress,
 			localPort: this.options.inPort || TIDAL_OSC_DEFAULTS.inPort,
-			remoteAddress: this.options.outAddress || TIDAL_OSC_DEFAULTS.outAddress,
-			remotePort: this.options.outPort  || TIDAL_OSC_DEFAULTS.outPort,
+			remoteAddress:
+				this.options.outAddress || TIDAL_OSC_DEFAULTS.outAddress,
+			remotePort: this.options.outPort || TIDAL_OSC_DEFAULTS.outPort,
 			broadcast: true,
 			metadata: true
 		})
 
-		udpPort.open()
+		this.udpPort.open()
 
-		udpPort.on('ready', () => {
+		this.udpPort.on('ready', () => {
 			this.emit('ready')
 		})
 
-		udpPort.on('bundle', (bundle) => {
-			_.forEach(bundle.packets, (packet) => {
+		this.udpPort.on('bundle', bundle => {
+			_.forEach(bundle.packets, packet => {
 				const address = packet.address
 				const args = packet.args
-	
+
 				if (_.startsWith(address, TIDAL_OSC_ADDRESSES.play)) {
 					let message = {}
 					for (var i = 0; i < args.length; i += 2) {
 						message[args[i].value] = args[i + 1].value
 					}
-	
+
 					setTimeout(() => {
-						this.emit('message',message)
+						this.emit('message', message)
 					}, message.delta * 1000)
 				}
 			})
 		})
 
-		udpPort.on('error', err => {
+		this.udpPort.on('error', err => {
 			this.emit('error', err)
 		})
 	}
 
 	cF = (message, value) => {
 		const f = parseFloat(value)
-		if (!isNaN(f)) sendCtrl(message, 'f', f)
+		if (!isNaN(f)) this.sendCtrl(message, 'f', f)
 	}
 
 	cI = (message, value) => {
-		const o = parseInt(value)
-		if (!isNaN(i)) sendCtrl(message, 'i', i)
+		const i = parseInt(value)
+		if (!isNaN(i)) this.sendCtrl(message, 'i', i)
 	}
 
 	cP = (message, value) => {
 		const s = value
-		sendCtrl(message, 's', s)
+		this.sendCtrl(message, 's', s)
 	}
 
 	sendCtrl = (message, type, value) => {
-		udpPort.send({
-			address: TIDAL_OSC_CTRL,
+		this.udpPort.send({
+			address: TIDAL_OSC_ADDRESSES.ctrl,
 			args: [
 				{
 					type: 's',
