@@ -1,0 +1,27 @@
+{
+  "name": "@vliegwerk/tidal",
+  "version": "1.0.0",
+  "description": "Node.js interface for TidalCycles",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njanssen/node-tidal.git"
+  },
+  "keywords": [
+    "tidalcycles",
+    "tidal"
+  ],
+  "author": "Niels Janssen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/njanssen/node-tidal/issues"
+  },
+  "homepage": "https://github.com/njanssen/node-tidal#readme",
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "osc": "^2.3.1"
+  }
+}
