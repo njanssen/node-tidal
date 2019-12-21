@@ -5,9 +5,9 @@ const osc = require('osc')
 
 const TIDAL_OSC_DEFAULTS = {
 	inAddress: '127.0.0.1',
-	inPort: 9000,
+	inPort: 57120,
 	outAddress: '127.0.0.1',
-	outPort: '6010'
+	outPort: 6010
 }
 
 const TIDAL_OSC_ADDRESS = {
