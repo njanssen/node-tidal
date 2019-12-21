@@ -1,6 +1,6 @@
 'use strict'
 
-const Tidal = require('../index')
+const Tidal = require('../')
 const tidal = new Tidal()
 
 tidal.on('ready', () => {
