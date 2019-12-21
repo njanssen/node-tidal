@@ -1,0 +1,2 @@
+-- Use pan from random value sent by random.js example
+d1 $ s "bd" # pan (cF 0.5 "random")

@@ -1,6 +1,7 @@
+'use strict'
+
 const EventEmitter = require('events')
 const osc = require('osc')
-const _ = require('lodash')
 
 const TIDAL_OSC_DEFAULTS = {
 	inAddress: '127.0.0.1',
@@ -9,24 +10,27 @@ const TIDAL_OSC_DEFAULTS = {
 	outPort: '6010'
 }
 
-const TIDAL_OSC_ADDRESSES = {
+const TIDAL_OSC_ADDRESS = {
 	ctrl: '/ctrl',
 	play: '/play2'
 }
 
 class Tidal extends EventEmitter {
-	constructor(options) {
+	constructor(options = {}) {
 		super()
 
-		this.options = options || TIDAL_OSC_DEFAULTS
+		const {
+			inAddress = TIDAL_OSC_DEFAULTS.inAddress,
+			inPort = TIDAL_OSC_DEFAULTS.inPort,
+			outAddress = TIDAL_OSC_DEFAULTS.outAddress,
+			outPort = TIDAL_OSC_DEFAULTS.outPort
+		} = options
 
 		this.udpPort = new osc.UDPPort({
-			localAddress:
-				this.options.inAddress || TIDAL_OSC_DEFAULTS.inAddress,
-			localPort: this.options.inPort || TIDAL_OSC_DEFAULTS.inPort,
-			remoteAddress:
-				this.options.outAddress || TIDAL_OSC_DEFAULTS.outAddress,
-			remotePort: this.options.outPort || TIDAL_OSC_DEFAULTS.outPort,
+			localAddress: inAddress,
+			localPort: inPort,
+			remoteAddress: outAddress,
+			remotePort: outPort,
 			broadcast: true,
 			metadata: true
 		})
@@ -38,12 +42,12 @@ class Tidal extends EventEmitter {
 		})
 
 		this.udpPort.on('bundle', bundle => {
-			_.forEach(bundle.packets, packet => {
+			for (let packet of bundle.packets) {
 				const address = packet.address
 				const args = packet.args
 
-				if (_.startsWith(address, TIDAL_OSC_ADDRESSES.play)) {
-					let message = {}
+				if (address.startsWith(TIDAL_OSC_ADDRESS.play)) {
+					const message = {}
 					for (var i = 0; i < args.length; i += 2) {
 						message[args[i].value] = args[i + 1].value
 					}
@@ -52,7 +56,7 @@ class Tidal extends EventEmitter {
 						this.emit('message', message)
 					}, message.delta * 1000)
 				}
-			})
+			}
 		})
 
 		this.udpPort.on('error', err => {
@@ -77,7 +81,7 @@ class Tidal extends EventEmitter {
 
 	sendCtrl = (message, type, value) => {
 		this.udpPort.send({
-			address: TIDAL_OSC_ADDRESSES.ctrl,
+			address: TIDAL_OSC_ADDRESS.ctrl,
 			args: [
 				{
 					type: 's',

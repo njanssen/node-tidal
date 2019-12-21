@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/njanssen/node-tidal#readme",
   "dependencies": {
-    "lodash": "^4.17.15",
     "osc": "^2.3.1"
   }
 }
