@@ -79,6 +79,11 @@ class Tidal extends EventEmitter {
 		this.sendCtrl(message, 's', s)
 	}
 
+	cS = (message, value) => {
+		const s = value
+		this.sendCtrl(message, 's', s)
+	}
+
 	sendCtrl = (message, type, value) => {
 		this.udpPort.send({
 			address: TIDAL_OSC_ADDRESS.ctrl,

@@ -15,7 +15,8 @@ npm install @vliegwerk/tidal --save
 ```
 
 ## Basic usage
-The following code can be used to start listening to TidalCycles' OSC messages.
+The following code can be used to start listening to TidalCycles' OSC messages:
+
 ```
 const Tidal = require('@vliegwerk/tidal')
 const tidal = new Tidal()
@@ -50,7 +51,16 @@ const tidal = new Tidal({
 })
 ```
 
-For more examples, see the `examples` folder in the [node-tidal repository on GitHub](https://github.com/njanssen/node-tidal/tree/master/examples).
+The following code can be used to send controller input OSC messages to TidalCycles:
+
+```
+tidal.cF('myFloat',1.0) // to send a float
+tidal.cI('myInt',1) // to send an integer
+tidal.cS('myString','Hello TidalCycles!') // to send a string 
+tidal.cP('myPattern','[0,5,7]') // to send a parseable pattern (e.g. a pattern for n)
+```
+
+For more examples, see the `examples` folder in the [node-tidal repository](https://github.com/njanssen/node-tidal/tree/master/examples) on GitHub.
 
 ## Extras
 
