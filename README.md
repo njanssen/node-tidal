@@ -50,6 +50,8 @@ const tidal = new Tidal({
 })
 ```
 
+For more examples, see the `examples` folder in the [node-tidal repository on GitHub](https://github.com/njanssen/node-tidal/tree/master/examples).
+
 ## Extras
 
 - Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
