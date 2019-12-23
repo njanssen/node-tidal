@@ -3,14 +3,16 @@
 const EventEmitter = require('events')
 const osc = require('osc')
 
-const TIDAL_OSC_DEFAULTS = {
+const OPTION_DEFAULTS = {
 	inAddress: '127.0.0.1',
 	inPort: 57120,
 	outAddress: '127.0.0.1',
-	outPort: 6010
+	outPort: 6010,
+	onTime: true,
+	augmentMessage: false 
 }
 
-const TIDAL_OSC_ADDRESS = {
+const OSC_ADDRESS = {
 	ctrl: '/ctrl',
 	play: '/play2'
 }
@@ -20,11 +22,15 @@ class Tidal extends EventEmitter {
 		super()
 
 		const {
-			inAddress = TIDAL_OSC_DEFAULTS.inAddress,
-			inPort = TIDAL_OSC_DEFAULTS.inPort,
-			outAddress = TIDAL_OSC_DEFAULTS.outAddress,
-			outPort = TIDAL_OSC_DEFAULTS.outPort
+			inAddress = OPTION_DEFAULTS.inAddress,
+			inPort = OPTION_DEFAULTS.inPort,
+			outAddress = OPTION_DEFAULTS.outAddress,
+			outPort = OPTION_DEFAULTS.outPort,
+			onTime =  OPTION_DEFAULTS.onTime,
+			augmentMessage = OPTION_DEFAULTS.augmentMessage,
 		} = options
+
+		this.onTime = onTime
 
 		this.udpPort = new osc.UDPPort({
 			localAddress: inAddress,
@@ -46,15 +52,25 @@ class Tidal extends EventEmitter {
 				const address = packet.address
 				const args = packet.args
 
-				if (address.startsWith(TIDAL_OSC_ADDRESS.play)) {
+				if (address.startsWith(OSC_ADDRESS.play)) {
 					const message = {}
 					for (var i = 0; i < args.length; i += 2) {
 						message[args[i].value] = args[i + 1].value
 					}
 
-					setTimeout(() => {
+					if (augmentMessage) {
+						message.octave = (typeof message.octave === 'undefined') ? 5 : message.octave
+						message.n = message.n || message.note || 0
+						message.midinote = message.n + (message.octave + 1) * 12
+					}
+
+					if (onTime) {
+						setTimeout(() => {
+							this.emit('message', message)
+						}, message.delta * 1000)
+					} else {
 						this.emit('message', message)
-					}, message.delta * 1000)
+					}
 				}
 			}
 		})
@@ -86,7 +102,7 @@ class Tidal extends EventEmitter {
 
 	sendCtrl = (message, type, value) => {
 		this.udpPort.send({
-			address: TIDAL_OSC_ADDRESS.ctrl,
+			address: OSC_ADDRESS.ctrl,
 			args: [
 				{
 					type: 's',
