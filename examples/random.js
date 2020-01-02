@@ -8,7 +8,7 @@ tidal.on('ready', () => {
 })
 
 tidal.on('message', message => {
-	console.log('Received Tidal message with pan:', message.pan)
+	console.log('Received Tidal message:', message)
 })
 
 tidal.on('error', err => {

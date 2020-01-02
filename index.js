@@ -9,7 +9,7 @@ const OPTION_DEFAULTS = {
 	outAddress: '127.0.0.1',
 	outPort: 6010,
 	onTime: true,
-	augmentMessage: false 
+	addMidiData: false 
 }
 
 const OSC_ADDRESS = {
@@ -27,7 +27,7 @@ class Tidal extends EventEmitter {
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
 			onTime =  OPTION_DEFAULTS.onTime,
-			augmentMessage = OPTION_DEFAULTS.augmentMessage,
+			addMidiData = OPTION_DEFAULTS.addMidiData,
 		} = options
 
 		this.onTime = onTime
@@ -58,7 +58,7 @@ class Tidal extends EventEmitter {
 						message[args[i].value] = args[i + 1].value
 					}
 
-					if (augmentMessage) {
+					if (addMidiData) {
 						message.octave = (typeof message.octave === 'undefined') ? 5 : message.octave
 						message.n = message.n || message.note || 0
 						message.midinote = message.n + (message.octave + 1) * 12
@@ -66,6 +66,7 @@ class Tidal extends EventEmitter {
 
 					if (onTime) {
 						setTimeout(() => {
+							delete message.delta
 							this.emit('message', message)
 						}, message.delta * 1000)
 					} else {
