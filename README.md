@@ -101,5 +101,6 @@ For example:
 ## Extras
 
 -   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
+-   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
 -   See the [License](LICENSE) file for license rights and limitations (MIT).
 -   Pull Requests are welcome!
