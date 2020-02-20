@@ -12,6 +12,12 @@ This library supports the following interactions with TidalCycles:
 ## Installation
 
 ```
+yarn add @vliegwerk/tidal
+```
+
+or
+
+```
 npm install @vliegwerk/tidal --save
 ```
 
@@ -36,7 +42,7 @@ tidal.on('error', err => {
 })
 ```
 
-This code create a new `Tidal` instance which depends on the [osc.js](https://www.npmjs.com/package/osc) library for initializing UDP ports for sending and receiving OSC messages. The argument of the event listener contains a JSON version of the OSC message sent by TidalCycles. For example:
+This code creates a new `Tidal` instance which depends on the [osc.js](https://www.npmjs.com/package/osc) library for initializing UDP ports for sending and receiving OSC messages. The argument of the event listener contains a JSON version of the OSC message sent by TidalCycles. For example:
 
 ```
 {
