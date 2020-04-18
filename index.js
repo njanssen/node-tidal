@@ -8,13 +8,12 @@ const OPTION_DEFAULTS = {
 	inPort: 57120,
 	outAddress: '127.0.0.1',
 	outPort: 6010,
-	onTime: true,
-	addMidiData: false 
+	addMidiData: false,
 }
 
 const OSC_ADDRESS = {
 	ctrl: '/ctrl',
-	play: '/play2'
+	play: '/play2',
 }
 
 class Tidal extends EventEmitter {
@@ -26,11 +25,10 @@ class Tidal extends EventEmitter {
 			inPort = OPTION_DEFAULTS.inPort,
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
-			onTime =  OPTION_DEFAULTS.onTime,
 			addMidiData = OPTION_DEFAULTS.addMidiData,
 		} = options
 
-		this.onTime = onTime
+		this.addMidiData = addMidiData
 
 		this.udpPort = new osc.UDPPort({
 			localAddress: inAddress,
@@ -38,7 +36,7 @@ class Tidal extends EventEmitter {
 			remoteAddress: outAddress,
 			remotePort: outPort,
 			broadcast: true,
-			metadata: true
+			metadata: true,
 		})
 
 		this.udpPort.open()
@@ -47,38 +45,40 @@ class Tidal extends EventEmitter {
 			this.emit('ready')
 		})
 
-		this.udpPort.on('bundle', bundle => {
+		this.udpPort.on('message', (packet) => {
+			this.handleMessage(packet)
+		})
+
+		this.udpPort.on('bundle', (bundle) => {
 			for (let packet of bundle.packets) {
-				const address = packet.address
-				const args = packet.args
-
-				if (address.startsWith(OSC_ADDRESS.play)) {
-					const message = {}
-					for (var i = 0; i < args.length; i += 2) {
-						message[args[i].value] = args[i + 1].value
-					}
-
-					if (addMidiData) {
-						message.octave = (typeof message.octave === 'undefined') ? 5 : message.octave
-						message.n = message.n || message.note || 0
-						message.midinote = message.n + (message.octave + 1) * 12
-					}
-
-					if (onTime) {
-						setTimeout(() => {
-							delete message.delta
-							this.emit('message', message)
-						}, message.delta * 1000)
-					} else {
-						this.emit('message', message)
-					}
-				}
+				this.handleMessage(packet)
 			}
 		})
 
-		this.udpPort.on('error', err => {
+		this.udpPort.on('error', (err) => {
 			this.emit('error', err)
 		})
+	}
+
+	handleMessage = (packet) => {
+		const address = packet.address
+		const args = packet.args
+
+		if (address.startsWith(OSC_ADDRESS.play)) {
+			const message = {}
+			for (var i = 0; i < args.length; i += 2) {
+				message[args[i].value] = args[i + 1].value
+			}
+
+			if (this.addMididata) {
+				message.octave =
+					typeof message.octave === 'undefined' ? 5 : message.octave
+				message.n = message.n || message.note || 0
+				message.midinote = message.n + (message.octave + 1) * 12
+			}
+
+			this.emit('message', message)
+		}
 	}
 
 	cF = (message, value) => {
@@ -107,13 +107,13 @@ class Tidal extends EventEmitter {
 			args: [
 				{
 					type: 's',
-					value: message
+					value: message,
 				},
 				{
 					type: type,
-					value: value
-				}
-			]
+					value: value,
+				},
+			],
 		})
 	}
 }

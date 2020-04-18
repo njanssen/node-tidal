@@ -48,6 +48,7 @@ This code creates a new `Tidal` instance which depends on the [osc.js](https://w
 {
     cps: 0.5625,
     cycle: 43,
+    delta: 1.7777776718139648,
     orbit: 0,
     s: 'bd'
 }
@@ -80,28 +81,20 @@ const tidal = new Tidal({
 ```
 
 TidalCycles sends out its OSC messages ahead of the time that the sound event should actually happen.
-By default, this library emits the `message` event after the time interval specified the `delta` field of the OSC message.
-This allows you to handle the message instantly in your code.
-To handle this interval by yourself, set `onTime` to `false` in your options.
-All `message` events will then be emited as soon as the OSC message arrives:
+This library emits the `message` event immediately after receiving an OSC message from TidalCycles
+which means you need to handle this interval by yourself, for instance by using the `setTimeout` function
+to delay processing of the incoming message.
+
+Another option is to tell TidalCycles to send the OSC messages in time by setting the `oTimestamp` of the OSC target
+to `NoStamp`. The following snippet taken from a `BootTidal.hs` file can be used two configure two OSC targets,
+one target on port `57120` for sound processing by SuperDirt/SuperCollider, and the other target on port `9000` for
+this library where message are sent at intime (`oTimestamp = NoStamp`).
 
 ```
-const tidal = new Tidal({
-	onTime: false
-})
-```
-
-With this option set to `false`, the JSON version of the incoming message will contain the `delta` field as sent by TidalCycles.
-For example:
-
-```
-{
-    cps: 0.5625,
-    cycle: 43,
-    delta: 1.7777776718139648,
-    orbit: 0,
-    s: 'bd'
-}
+tidal <- startMulti [
+        superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 57120}
+    ,   superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 9000, oTimestamp = NoStamp}
+    ] (defaultConfig {cFrameTimespan = 1/20})
 ```
 
 ## Extras
