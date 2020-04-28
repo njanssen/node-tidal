@@ -42,7 +42,7 @@ tidal.on('error', err => {
 })
 ```
 
-This code creates a new `Tidal` instance which depends on the [osc.js](https://www.npmjs.com/package/osc) library for initializing UDP ports for sending and receiving OSC messages. The argument of the event listener contains a JSON version of the OSC message sent by TidalCycles. For example:
+This code creates a new `Tidal` instance which depends on the [osc.js](https://www.npmjs.com/package/osc) library for initializing UDP ports for sending and receiving OSC messages. The argument of the event listener contains a Javscript object version of the OSC message sent by TidalCycles. For example:
 
 ```
 {
@@ -88,13 +88,42 @@ to delay processing of the incoming message.
 Another option is to tell TidalCycles to send the OSC messages in time by setting the `oTimestamp` of the OSC target
 to `NoStamp`. The following snippet taken from a `BootTidal.hs` file can be used two configure two OSC targets,
 one target on port `57120` for sound processing by SuperDirt/SuperCollider, and the other target on port `9000` for
-this library where message are sent at intime (`oTimestamp = NoStamp`).
+this library where message are sent at in time (`oTimestamp = NoStamp`).
 
 ```
 tidal <- startMulti [
         superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 57120}
     ,   superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 9000, oTimestamp = NoStamp}
     ] (defaultConfig {cFrameTimespan = 1/20})
+```
+
+## Network tempo sharing
+
+TidalCycles supports [network tempo sharing](https://tidalcycles.org/index.php/Network_tempo_sharing) which allows you to synchronize multiple computers running TidalCycles.
+
+The following configuration will make your `Tidal` instance listen for these tempo messages:
+
+```
+const Tidal = require('@vliegwerk/tidal')
+const tidal = new Tidal({
+	listenTempo : true
+})
+
+tidal.on('tempo', message => {
+	console.log(message)
+})
+```
+
+Tempo messages are sent directly after connecting to the tempo server, and whenever you evaluate the `setcps` or `resetCycles` functions in TidalCycles.
+
+The following Javascipt object is an example of the OSC message with tempo information sent by TidalCycles:
+
+```
+{
+    atCycle: 173.8507843017578,
+    cps: 0.699999988079071,
+    paused: 0
+}
 ```
 
 ## Extras

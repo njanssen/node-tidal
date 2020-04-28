@@ -9,11 +9,15 @@ const OPTION_DEFAULTS = {
 	outAddress: '127.0.0.1',
 	outPort: 6010,
 	addMidiData: false,
+	listenTempo: false,
+	tempoAddress: '127.0.0.1',
+	tempoPort: 9160,
 }
 
 const OSC_ADDRESS = {
 	ctrl: '/ctrl',
 	play: '/play2',
+	tempo: '/cps/cycle',
 }
 
 class Tidal extends EventEmitter {
@@ -26,6 +30,9 @@ class Tidal extends EventEmitter {
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
 			addMidiData = OPTION_DEFAULTS.addMidiData,
+			listenTempo = OPTION_DEFAULTS.listenTempo,
+			tempoAddress = OPTION_DEFAULTS.tempoAddress,
+			tempoPort = OPTION_DEFAULTS.tempoPort,
 		} = options
 
 		this.addMidiData = addMidiData
@@ -58,6 +65,29 @@ class Tidal extends EventEmitter {
 		this.udpPort.on('error', (err) => {
 			this.emit('error', err)
 		})
+
+		if (listenTempo) {
+			this.tempoPort = new osc.UDPPort({
+				localAddress: inAddress,
+				localPort: inPort + 1,
+				remoteAddress: tempoAddress,
+				remotePort: tempoPort,
+				metadata: true,
+			})
+
+			this.tempoPort.open()
+
+			this.tempoPort.on('ready', () => {
+				this.tempoPort.send({
+					address: '/hello',
+					args: [],
+				})
+			})
+
+			this.tempoPort.on('message', (packet) => {
+				this.handleMessage(packet)
+			})
+		}
 	}
 
 	handleMessage = (packet) => {
@@ -78,6 +108,13 @@ class Tidal extends EventEmitter {
 			}
 
 			this.emit('message', message)
+		} else if (address.startsWith(OSC_ADDRESS.tempo)) {
+			const data = {
+				atCycle: args[0].value,
+				cps: args[1].value,
+				paused: args[2].value,
+			}
+			this.emit('tempo', data)
 		}
 	}
 
