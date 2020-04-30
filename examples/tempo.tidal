@@ -1,3 +1,5 @@
-setcps 0.8
+-- Changing cps will result in an event in tempo.js
+setcps 0.5
 
+-- Resetting cycles back to 0 will also result in an event in tempo.js
 resetCycles

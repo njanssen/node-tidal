@@ -1,0 +1,2 @@
+-- Continuously change panning to show left and right channel readings in rms.js
+d1 $ s "bd(<3 7 5>,8)" # pan (slow 4 sine)

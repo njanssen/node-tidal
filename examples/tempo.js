@@ -12,3 +12,4 @@ tidal.on('tempo', message => {
 tidal.on('error', err => {
 	console.error('Error occured:', err)
 })
+

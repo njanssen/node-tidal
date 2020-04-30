@@ -8,6 +8,8 @@ This library supports the following interactions with TidalCycles:
 
 -   Sending [controller input](https://tidalcycles.org/index.php/Controller_Input) OSC messages to TidalCycles
 -   Listening to standard or [custom](https://tidalcycles.org/index.php/Custom_OSC) OSC messages from TidalCycles
+-   Listening to [tempo](https://tidalcycles.org/index.php/Network_tempo_sharing) messages from TidalCycles
+-   Listening to RMS messages from SuperDirt
 
 ## Installation
 
@@ -53,6 +55,8 @@ This code creates a new `Tidal` instance which depends on the [osc.js](https://w
     s: 'bd'
 }
 ```
+
+Please note that the orbit numbering starts at 0 in these messages. So, orbit 1 (e.g. `# orbit 1`) in TidalCycles will appear as `orbit: 0` in these messages.
 
 The following code can be used to send controller input OSC messages to TidalCycles:
 
@@ -116,7 +120,7 @@ tidal.on('tempo', message => {
 
 Tempo messages are sent directly after connecting to the tempo server, and whenever you evaluate the `setcps` or `resetCycles` functions in TidalCycles.
 
-The following Javascipt object is an example of the OSC message with tempo information sent by TidalCycles:
+The following Javascipt object is an example of the data that's available on a `tempo` event:
 
 ```
 {
@@ -126,9 +130,55 @@ The following Javascipt object is an example of the OSC message with tempo infor
 }
 ```
 
+## SuperDirt RMS messages
+
+This library can listen for RMS readings sent by SuperDirt. These messages can be used to build VU meters. To enable listening to RMS messages, you should first run the following code in SuperCollider before starting SuperDirt:
+
+```
+s.options.maxLogins = 8;
+```
+
+And the following code after starting SuperDirt (e.g. with `SuperDirt.start`):
+
+```
+ ~dirt.startSendRMS;
+```
+
+Please make sure this code has been evaluated in SuperCollider before initializing your `Tidal` class.
+
+The following configuration will make your `Tidal` instance listen for SuperDirt's RMS messages:
+
+```
+const Tidal = require('@vliegwerk/tidal')
+const tidal = new Tidal({
+	listenRms : true
+})
+
+tidal.on('rms', message => {
+	console.log(message)
+})
+```
+
+The following Javascipt object is an example of the data that's available on an `rms` event:
+
+```
+{
+  orbit: 0,
+  channels: [
+    { peak: 0.31483814120292664, power: 0.04383470118045807 },
+    { peak: 0.1453121155500412, power: 0.01931002549827099 }
+  ]
+}
+```
+
+This message contains the peak and power value per channel for an orbit.
+In this case, the message contains the peak and power values for the left and the right channel for orbit 1.
+
 ## Extras
 
--   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
--   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
--   See the [License](LICENSE) file for license rights and limitations (MIT).
--   Pull Requests are welcome!
+*   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
+*   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
+*   The code for listening to SuperDirt's RMS messages is based on the implementation of the VU meters in Alex McLean's [Feedforward](https://github.com/yaxu/feedforward)
+    editor for TidalCycles.
+*   See the [License](LICENSE) file for license rights and limitations (MIT).
+*   Pull Requests are welcome!
