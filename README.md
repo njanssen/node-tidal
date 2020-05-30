@@ -71,7 +71,7 @@ For more examples, see the `examples` folder in the [node-tidal repository](http
 
 ## Configuration
 
-By default, your `Tidal` instance will listen for OSC messages on port `57120` which is the standard port used by TidalCycles to send OSC messages to SuperDirt/SuperCollider for producing sound. You can tell TidalCycles to use another port number or send (custom) OSC messages to multiple targets by updating your `BootTidal.hs` file. For more details, see the [TidalCycles documentation](https://tidalcycles.org/index.php/Custom_OSC).
+By default, your `Tidal` instance will listen for OSC messages on port `57120` which is the standard port used by TidalCycles to send OSC messages to SuperDirt/SuperCollider for producing sound. You can tell TidalCycles to use another port number and/or send (custom) OSC messages to multiple targets by updating your `BootTidal.hs` file. For more details, see the [TidalCycles documentation](https://tidalcycles.org/index.php/Custom_OSC).
 
 Specify the UDP ports to use for communicating with TidalCycles when creating an instance of `Tidal` in your code:
 
@@ -85,21 +85,26 @@ const tidal = new Tidal({
 ```
 
 TidalCycles sends out its OSC messages ahead of the time that the sound event should actually happen.
-This library emits the `message` event immediately after receiving an OSC message from TidalCycles
+Your `Tidal` instance will emit the `message` event immediately after receiving an OSC message from TidalCycles
 which means you need to handle this interval by yourself, for instance by using the `setTimeout` function
 to delay processing of the incoming message.
 
-Another option is to tell TidalCycles to send the OSC messages in time by setting the `oTimestamp` of the OSC target
-to `NoStamp`. The following snippet taken from a `BootTidal.hs` file can be used two configure two OSC targets,
-one target on port `57120` for sound processing by SuperDirt/SuperCollider, and the other target on port `9000` for
-this library where message are sent at in time (`oTimestamp = NoStamp`).
+Another option is to tell TidalCycles to send the OSC messages in time by setting `oSchedule` of the OSC target to `Live`.
+
+The following snippet taken from a `BootTidal.hs` file can be used to configure two OSC targets,
+one standard SuperDirt target on port `57120` for sound processing by SuperDirt/SuperCollider, and another custom OSC target on port `9000` for
+this library where message are sent in time (`oSchedule = Live`).
 
 ```
-tidal <- startMulti [
-        superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 57120}
-    ,   superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 9000, oTimestamp = NoStamp}
-    ] (defaultConfig {cFrameTimespan = 1/20})
+:{
+tidal <- startStream defaultConfig [
+           (superdirtTarget {oLatency = 0.1, oAddress = "127.0.0.1", oPort = 57120}, [superdirtShape])
+         , (Target {oName = "node-tidal", oAddress = "127.0.0.1", oPort = 9000, oLatency = 0.2, oWindow = Nothing, oSchedule = Live}, [superdirtShape])
+         ]
+:}
 ```
+
+Please note that you can also define your own OSC message structure instead of using the standard `superdirtShape`. For examples, see the [TidalCycles documentation](https://tidalcycles.org/index.php/Custom_OSC). Currently, your `Tidal` instance will only emit `message` events for the standard SuperDirt `/play2` OSC messages.
 
 ## Network tempo sharing
 
@@ -176,9 +181,9 @@ In this case, the message contains the peak and power values for the left and th
 
 ## Extras
 
-*   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
-*   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
-*   The code for listening to SuperDirt's RMS messages is based on the implementation of the VU meters in Alex McLean's [Feedforward](https://github.com/yaxu/feedforward)
+-   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
+-   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
+-   The code for listening to SuperDirt's RMS messages is based on the implementation of the VU meters in Alex McLean's [Feedforward](https://github.com/yaxu/feedforward)
     editor for TidalCycles.
-*   See the [License](LICENSE) file for license rights and limitations (MIT).
-*   Pull Requests are welcome!
+-   See the [License](LICENSE) file for license rights and limitations (MIT).
+-   Pull Requests are welcome!
