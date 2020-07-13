@@ -38,7 +38,7 @@ class Tidal extends EventEmitter {
 			inPort = OPTION_DEFAULTS.inPort,
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
-			addressPattern = OPTIONS_DEFAULTS.addressPattern,
+			addressPattern = OPTION_DEFAULTS.addressPattern,
 			// Add extra inferred MIDI information to TidalCycles messages
 			addMidiData = OPTION_DEFAULTS.addMidiData,
 			// Listen to tempo messages sent by TidalCycles
