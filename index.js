@@ -2,20 +2,7 @@
 
 const EventEmitter = require('events')
 const osc = require('osc')
-
-const OPTION_DEFAULTS = {
-	inAddress: '127.0.0.1',
-	inPort: 57120,
-	outAddress: '127.0.0.1',
-	outPort: 6010,
-	addMidiData: false,
-	listenTempo: false,
-	tempoAddress: '127.0.0.1',
-	tempoPort: 9160,
-	listenRms: false,
-	rmsAddress: '127.0.0.1',
-	rmsPort: 57110,
-}
+const { timeStamp } = require('console')
 
 const OSC_ADDRESS = {
 	ctrl: '/ctrl',
@@ -24,6 +11,21 @@ const OSC_ADDRESS = {
 	tempo: '/cps/cycle',
 	notifyRequest: '/notify',
 	rms: '/rms',
+}
+
+const OPTION_DEFAULTS = {
+	inAddress: '127.0.0.1',
+	inPort: 57120,
+	outAddress: '127.0.0.1',
+	outPort: 6010,
+	addressPattern: OSC_ADDRESS.play,
+	addMidiData: false,
+	listenTempo: false,
+	tempoAddress: '127.0.0.1',
+	tempoPort: 9160,
+	listenRms: false,
+	rmsAddress: '127.0.0.1',
+	rmsPort: 57110,
 }
 
 class Tidal extends EventEmitter {
@@ -36,6 +38,7 @@ class Tidal extends EventEmitter {
 			inPort = OPTION_DEFAULTS.inPort,
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
+			addressPattern = OPTIONS_DEFAULTS.addressPattern,
 			// Add extra inferred MIDI information to TidalCycles messages
 			addMidiData = OPTION_DEFAULTS.addMidiData,
 			// Listen to tempo messages sent by TidalCycles
@@ -48,6 +51,7 @@ class Tidal extends EventEmitter {
 			rmsPort = OPTION_DEFAULTS.rmsPort,
 		} = options
 
+		this.addressPattern = addressPattern
 		this.addMidiData = addMidiData
 
 		this.connectTidal(inAddress, inPort, outAddress, outPort)
@@ -150,7 +154,7 @@ class Tidal extends EventEmitter {
 		const args = packet.args
 
 		switch (address) {
-			case OSC_ADDRESS.play:
+			case this.addressPattern:
 				const message = {}
 				for (var i = 0; i < args.length; i += 2) {
 					message[args[i].value] = args[i + 1].value
