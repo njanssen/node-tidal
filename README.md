@@ -104,7 +104,18 @@ tidal <- startStream defaultConfig [
 :}
 ```
 
-Please note that you can also define your own OSC message structure instead of using the standard `superdirtShape`. For examples, see the [TidalCycles documentation](https://tidalcycles.org/index.php/Custom_OSC). Currently, your `Tidal` instance will only emit `message` events for the standard SuperDirt `/play2` OSC messages.
+Please note that you can also define your own OSC message structure instead of using the standard `superdirtShape`. For examples, see the [TidalCycles documentation](https://tidalcycles.org/index.php/Custom_OSC).
+
+By default, your `Tidal` instance will emit `message` events for the standard SuperDirt `/play2` OSC messages.
+You can configure a custom OSC address pattern using the `addressPattern` option when instantiating your `Tidal` instance:
+
+```
+const tidal = new Tidal({
+	inAddress: '127.0.0.1',
+	inPort: 9000,
+	addressPattern: '/myaddresspattern'
+})
+```
 
 ## Network tempo sharing
 
