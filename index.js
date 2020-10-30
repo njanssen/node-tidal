@@ -18,6 +18,7 @@ const OPTION_DEFAULTS = {
 	inPort: 57120,
 	outAddress: '127.0.0.1',
 	outPort: 6010,
+	broadcast: true,
 	addressPattern: OSC_ADDRESS.play,
 	addMidiData: false,
 	listenTempo: false,
@@ -38,6 +39,7 @@ class Tidal extends EventEmitter {
 			inPort = OPTION_DEFAULTS.inPort,
 			outAddress = OPTION_DEFAULTS.outAddress,
 			outPort = OPTION_DEFAULTS.outPort,
+			broadcast = OPTION_DEFAULTS.broadcast,
 			addressPattern = OPTION_DEFAULTS.addressPattern,
 			// Add extra inferred MIDI information to TidalCycles messages
 			addMidiData = OPTION_DEFAULTS.addMidiData,
@@ -54,7 +56,7 @@ class Tidal extends EventEmitter {
 		this.addressPattern = addressPattern
 		this.addMidiData = addMidiData
 
-		this.connectTidal(inAddress, inPort, outAddress, outPort)
+		this.connectTidal(inAddress, inPort, outAddress, outPort, broadcast)
 
 		if (listenTempo) {
 			this.connectTempo(inAddress, inPort + 1, tempoAddress, tempoPort)
@@ -65,13 +67,13 @@ class Tidal extends EventEmitter {
 		}
 	}
 
-	connectTidal = (inAddress, inPort, outAddress, outPort) => {
+	connectTidal = (inAddress, inPort, outAddress, outPort, broadcast) => {
 		this.udpPort = new osc.UDPPort({
 			localAddress: inAddress,
 			localPort: inPort,
 			remoteAddress: outAddress,
 			remotePort: outPort,
-			broadcast: true,
+			broadcast: broadcast,
 			metadata: true,
 		})
 
