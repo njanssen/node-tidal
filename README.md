@@ -67,6 +67,19 @@ tidal.cS('myString','Hello TidalCycles!') // to send a string
 tidal.cP('myPattern','[0,5,7]') // to send a parseable pattern (e.g. a pattern for n)
 ```
 
+Interact with patterns by sending playback controller OSC messages to TidalCycles:
+
+```
+tidal.solo('1') // to solo pattern d1
+tidal.unsolo('drums') // to unsolo named pattern "drums"
+tidal.unsoloAll() // to unsolo all patterns
+tidal.mute('1') // to mute pattern d1
+tidal.muteAll() // to mute all patterns
+tidal.unmute('drums') // to unmute named pattern "drums"
+tidal.unmuteAll() // to unmute all patterns
+tidal.hush() // trigger hush\
+```
+
 For more examples, see the `examples` folder in the [node-tidal repository](https://github.com/njanssen/node-tidal/tree/master/examples) on GitHub.
 
 ## Configuration
@@ -192,7 +205,7 @@ In this case, the message contains the peak and power values for the left and th
 
 ## Extras
 
--   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/index.php/Installation).
+-   Install your TidalCycles environment by following the instructions found in the [TidalCycles documentation](https://tidalcycles.org/docs/).
 -   For a basic project using this library, see [tidal-pilot](https://github.com/njanssen/tidal-pilot).
 -   The code for listening to SuperDirt's RMS messages is based on the implementation of the VU meters in Alex McLean's [Feedforward](https://github.com/yaxu/feedforward)
     editor for TidalCycles.

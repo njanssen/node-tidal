@@ -8,9 +8,11 @@ const OSC_ADDRESS = {
   ctrl: "/ctrl",
   mute: "/mute",
   muteAll: "/muteAll",
-  unMuteAll: "/unmuteAll",
+  unmute: "/mute",
+  unmuteAll: "/unmuteAll",
   solo: "/solo",
-  unSoloAll: "/unsoloAll",
+  unsolo: "/unsolo",
+  unsoloAll: "/unsoloAll",
   hush: "/hush",
   play: "/play2",
   tempoRequest: "/hello",
@@ -238,9 +240,71 @@ class Tidal extends EventEmitter {
     });
   };
 
-  sendSoloAll = () => {
+  sendSolo = (pattern) => {
     this.udpPort.send({
-      address: OSC_ADDRESS.soloAll,
+      address: OSC_ADDRESS.solo,
+      args: [
+        {
+          type: "s",
+          value: pattern,
+        },
+      ],
+    });
+  };
+
+  sendUnsolo = (pattern) => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.unsolo,
+      args: [
+        {
+          type: "s",
+          value: pattern,
+        },
+      ],
+    });
+  };
+
+  sendUnsoloAll = () => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.unsoloAll,
+      args: [],
+    });
+  };
+
+  sendMute = (pattern) => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.mute,
+      args: [
+        {
+          type: "s",
+          value: pattern,
+        },
+      ],
+    });
+  };
+
+  sendMuteAll = () => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.muteAll,
+      args: [],
+    });
+  };
+
+  sendUnmute = (pattern) => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.unmute,
+      args: [
+        {
+          type: "s",
+          value: pattern,
+        },
+      ],
+    });
+  };
+
+  sendUnmuteAll = () => {
+    this.udpPort.send({
+      address: OSC_ADDRESS.unmuteAll,
       args: [],
     });
   };
